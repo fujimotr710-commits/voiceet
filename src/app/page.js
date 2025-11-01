@@ -1,33 +1,35 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const [audios, setAudios] = useState([]); // 履歴を保存する配列
-  let mediaRecorder;
-  let chunks = [];
+  const mediaRecorderRef = useRef(null); // mediaRecorderを保持
+  const chunksRef = useRef([]); // データチャンクを保持
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorderRef.current = mediaRecorder;
+    chunksRef.current = [];
+
     mediaRecorder.start();
     setRecording(true);
 
     mediaRecorder.ondataavailable = (e) => {
-      chunks.push(e.data);
+      chunksRef.current.push(e.data);
     };
 
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/mp3" });
+      const blob = new Blob(chunksRef.current, { type: "audio/mp3" });
       const url = URL.createObjectURL(blob);
       setAudios((prev) => [...prev, url]); // 履歴に追加
-      chunks = [];
       setRecording(false);
     };
   }
 
   function stopRecording() {
-    mediaRecorder.stop();
+    mediaRecorderRef.current?.stop();
   }
 
   return (
