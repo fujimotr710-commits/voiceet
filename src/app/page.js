@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <h1 className="text-3xl font-bold mb-8">Voice SNS</h1>
+      <h1 className="text-3xl font-bold mb-8">Voiceet</h1>
 
       {!recording ? (
         <button
