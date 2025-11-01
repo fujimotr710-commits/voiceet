@@ -3,7 +3,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [recording, setRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState(null);
+  const [audios, setAudios] = useState([]); // 履歴を保存する配列
   let mediaRecorder;
   let chunks = [];
 
@@ -19,7 +19,8 @@ export default function Home() {
 
     mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: "audio/mp3" });
-      setAudioUrl(URL.createObjectURL(blob));
+      const url = URL.createObjectURL(blob);
+      setAudios((prev) => [...prev, url]); // 履歴に追加
       chunks = [];
       setRecording(false);
     };
@@ -49,9 +50,14 @@ export default function Home() {
         </button>
       )}
 
-      {audioUrl && (
-        <audio controls src={audioUrl} className="mt-4"></audio>
-      )}
+      {/* 録音履歴一覧 */}
+      <div className="w-full max-w-md space-y-4">
+        {audios.map((url, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg shadow">
+            <audio controls src={url} className="w-full"></audio>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
